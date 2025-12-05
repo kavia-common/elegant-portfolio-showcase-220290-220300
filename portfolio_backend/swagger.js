@@ -9,7 +9,7 @@ const options = {
       description: 'Portfolio backend API for about, projects, experience, and contact.',
     },
     servers: [
-      { url: 'http://localhost:3000' },
+      { url: 'http://localhost:3001' },
     ],
     tags: [
       { name: 'Health', description: 'Service health and diagnostics' },

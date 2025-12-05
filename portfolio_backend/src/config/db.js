@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 /**
  * Connect to MongoDB using Mongoose.
  * Reads connection info from environment variables:
- * - MONGODB_URL: the full MongoDB connection string (preferred)
+ * - MONGODB_URI: the full MongoDB connection string (preferred, aligns with db_connection.txt)
+ * - MONGODB_URL: legacy alias for full connection string (still supported)
  * - MONGODB_HOST, MONGODB_PORT, MONGODB_DB, MONGODB_USER, MONGODB_PASSWORD as fallback
  */
 async function connectMongo() {
@@ -15,6 +16,7 @@ async function connectMongo() {
    * Returns the active mongoose connection.
    */
   const {
+    MONGODB_URI,
     MONGODB_URL,
     MONGODB_HOST = 'localhost',
     MONGODB_PORT = '27017',
@@ -23,11 +25,13 @@ async function connectMongo() {
     MONGODB_PASSWORD,
   } = process.env;
 
-  let uri = MONGODB_URL;
+  // Prefer MONGODB_URI, then MONGODB_URL, then build from parts
+  let uri = MONGODB_URI || MONGODB_URL;
   if (!uri) {
-    // Build URI from parts if full URL is not provided
     const auth =
-      MONGODB_USER && MONGODB_PASSWORD ? `${encodeURIComponent(MONGODB_USER)}:${encodeURIComponent(MONGODB_PASSWORD)}@` : '';
+      MONGODB_USER && MONGODB_PASSWORD
+        ? `${encodeURIComponent(MONGODB_USER)}:${encodeURIComponent(MONGODB_PASSWORD)}@`
+        : '';
     uri = `mongodb://${auth}${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DB}`;
   }
 
