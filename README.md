@@ -16,3 +16,6 @@ Configuration
 
 CORS
 - CORS is enabled; set CORS_ORIGIN to your frontend URL (e.g., http://localhost:3000).
+
+Environment
+- Copy portfolio_backend/.env.example to portfolio_backend/.env and adjust values. Ensure MONGODB_URL points to your database.

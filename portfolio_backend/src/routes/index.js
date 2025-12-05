@@ -222,6 +222,50 @@ router.delete('/experience/:id', experienceController.remove.bind(experienceCont
  *         description: Created contact message
  */
 router.get('/contact', contactController.list.bind(contactController));
-router.post('/contact', contactController.submit.bind(contactController));
+
+// Simple validation middleware for contact submission
+function validateContact(req, res, next) {
+  /** Validate contact payload: name, email, message are required and email must be valid-ish */
+  const { name, email, message } = req.body || {};
+  const errors = [];
+  if (!name || typeof name !== 'string' || name.trim().length === 0) errors.push('name is required');
+  if (!email || typeof email !== 'string' || email.trim().length === 0) {
+    errors.push('email is required');
+  } else {
+    // rudimentary email pattern
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) errors.push('email is invalid');
+  }
+  if (!message || typeof message !== 'string' || message.trim().length === 0) errors.push('message is required');
+
+  if (errors.length) {
+    return res.status(400).json({ message: 'Validation failed', errors });
+  }
+  return next();
+}
+
+/**
+ * @swagger
+ * /contact:
+ *   get:
+ *     tags: [Contact]
+ *     summary: List contact submissions
+ *     responses:
+ *       200:
+ *         description: Contact submissions
+ *   post:
+ *     tags: [Contact]
+ *     summary: Submit a contact message
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Created contact message
+ */
+router.post('/contact', validateContact, contactController.submit.bind(contactController));
 
 module.exports = router;
